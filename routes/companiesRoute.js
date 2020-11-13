@@ -1,6 +1,8 @@
 const Router = require("express").Router;
 const router = new Router();
 const ExpressError = require("../helpers/ExpressError");
+const jsonschema = require("jsonschema");
+const companySchema = require("../schemas/companySchema.json");
 const Company = require("../models/company");
 
 // Get list of companies.
@@ -28,6 +30,14 @@ router.get("/:handle", async (req, res, next) => {
 
 // Update a company.
 router.patch("/:handle", async (req, res, next) => {
+  const result = jsonschema.validate(req.body, companySchema);
+  if (!result.valid) {
+    // pass validation errors to error handler
+    //  (the "stack" key is generally the most useful)
+    let listOfErrors = result.errors.map((error) => error.stack);
+    let error = new ExpressError(listOfErrors, 400);
+    return next(error);
+  }
   try {
     let company = await Company.update(req.params.handle, req.body);
     return res.status(200).json({ company: company });
@@ -38,6 +48,14 @@ router.patch("/:handle", async (req, res, next) => {
 
 // Create a company
 router.post("/", async (req, res, next) => {
+  const result = jsonschema.validate(req.body, companySchema);
+  if (!result.valid) {
+    // pass validation errors to error handler
+    //  (the "stack" key is generally the most useful)
+    let listOfErrors = result.errors.map((error) => error.stack);
+    let error = new ExpressError(listOfErrors, 400);
+    return next(error);
+  }
   try {
     let newCompany = await Company.add(req.body);
     return res.status(201).json({ company: newCompany });
