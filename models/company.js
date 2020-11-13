@@ -74,6 +74,17 @@ class Company {
     }
     return result.rows;
   }
+  static async delete(handle) {
+    const result = await db.query(
+      `
+    DELETE FROM companies
+    WHERE handle = $1
+    `,
+      [handle]
+    );
+
+    return result.rows;
+  }
 }
 
 module.exports = Company;
