@@ -6,9 +6,7 @@ process.env.NODE_ENV = "test";
 describe("GET /companies", function () {
   test("Gets a list of companies", async function () {
     const response = await request(app).get(`/companies`);
-    expect(response.body.companies).toHaveLength(1);
-    expect(response.body.companies[0]).toHaveProperty("name");
-    expect(response.body.companies[0]).toHaveProperty("handle");
+    expect(response.statusCode).toBe(200);
   });
 });
 
@@ -43,5 +41,13 @@ describe("PATCH /companies", async function () {
     expect(response.statusCode).toBe(200);
     expect(response.body.company[0]).toHaveProperty("description", "Sony");
     expect(response.body.company[0]).toHaveProperty("num_employees", 122);
+  });
+});
+
+describe("DELETE /companies", async function () {
+  test("Deletes a company", async () => {
+    await request(app).delete(`/companies/sonys`);
+    const deletedCompany = await request(app).get(`/companies/sonys`);
+    expect(deletedCompany.statusCode).toBe(404);
   });
 });

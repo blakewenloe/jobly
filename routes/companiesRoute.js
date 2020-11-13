@@ -1,5 +1,6 @@
 const Router = require("express").Router;
 const router = new Router();
+const ExpressError = require("../helpers/ExpressError");
 const Company = require("../models/company");
 
 // Get list of companies.
@@ -16,6 +17,9 @@ router.get("/", async (req, res, next) => {
 router.get("/:handle", async (req, res, next) => {
   try {
     let company = await Company.get(req.params.handle);
+    if (company.length === 0) {
+      throw new ExpressError(`${req.params.handle} not found`, 404);
+    }
     return res.status(200).json({ company: company });
   } catch (err) {
     return next(err);
