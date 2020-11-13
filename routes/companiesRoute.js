@@ -22,6 +22,16 @@ router.get("/:handle", async function (req, res, next) {
   }
 });
 
+// Update a company.
+router.patch("/:handle", async function (req, res, next) {
+  try {
+    let company = await Company.update(req.params.handle, req.body);
+    return res.status(200).json({ company: company });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 // Create a company
 router.post("/", async function (req, res, next) {
   try {

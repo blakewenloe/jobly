@@ -1,5 +1,5 @@
 const db = require("../db");
-
+const ExpressError = require("../ExpressError");
 class Company {
   /** Find all companies (can filter on terms in data). */
   static async getAll(data) {
@@ -52,11 +52,26 @@ class Company {
 
   static async get(handle) {
     const result = await db.query(
-      `SELECT handle, name
+      `SELECT handle, name, num_employees, description, logo_url
       FROM companies
       WHERE handle = $1`,
       [handle]
     );
+    return result.rows;
+  }
+
+  static async update(handle, data) {
+    let { num_employees, description, logo_url } = data;
+    const result = await db.query(
+      `UPDATE companies
+      SET num_employees=$1, description=$2, logo_url=$3
+      WHERE handle = $4
+      RETURNING num_employees, description, logo_url`,
+      [num_employees, description, logo_url, handle]
+    );
+    if (result.rows.length === 0) {
+      throw new ExpressError(`${handle} does not exist`, 404);
+    }
     return result.rows;
   }
 }
