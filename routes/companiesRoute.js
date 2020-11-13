@@ -12,4 +12,14 @@ router.get("/", async function (req, res, next) {
   }
 });
 
+// Create a company
+router.post("/", async function (req, res, next) {
+  try {
+    let newCompany = await Company.add(req.body);
+    return res.status(201).json({ company: newCompany });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 module.exports = router;

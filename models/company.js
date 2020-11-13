@@ -38,6 +38,17 @@ class Company {
     const companiesRes = await db.query(finalQuery, queryValues);
     return companiesRes.rows;
   }
+
+  static async add(data) {
+    let { handle, name, num_employees, description, logo_url } = data;
+    const result = await db.query(
+      `INSERT INTO companies(handle, name, num_employees, description, logo_url)
+      VALUES($1,$2,$3,$4,$5)
+      RETURNING handle, name, num_employees, description, logo_url`,
+      [handle, name, num_employees, description, logo_url]
+    );
+    return result.rows;
+  }
 }
 
 module.exports = Company;

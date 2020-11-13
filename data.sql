@@ -14,11 +14,3 @@ CREATE TABLE companies (
     description text,
     logo_url text
 );
-INSERT INTO companies
-VALUES (
-        'abc',
-        'abc commercial',
-        33,
-        'commercial company',
-        'http://abc.com'
-    );

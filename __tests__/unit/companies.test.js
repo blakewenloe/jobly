@@ -1,5 +1,7 @@
 const app = require("../../app");
 const request = require("supertest");
+const db = require("../../db");
+process.env.NODE_ENV = "test";
 
 describe("GET /companies", function () {
   test("Gets a list of companies", async function () {
