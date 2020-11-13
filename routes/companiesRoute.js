@@ -1,6 +1,6 @@
 const Router = require("express").Router;
 const router = new Router();
-const Company = require("../models/companies");
+const Company = require("../models/company");
 
 // Get list of companies.
 router.get("/", async function (req, res, next) {
