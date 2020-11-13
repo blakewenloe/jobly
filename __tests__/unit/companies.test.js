@@ -10,6 +10,21 @@ describe("GET /companies", function () {
   });
 });
 
+describe("GET /companies/:handle", function () {
+  test("Gets a company by handle", async function () {
+    await request(app).post(`/companies`).send({
+      handle: "sonys",
+      name: "Sonys",
+      num_employees: 500,
+      description: "Sony Entertainment",
+      logo_url: "https://www.sony.net/top/2017/img/icon/top-og.jpg",
+    });
+    const response = await request(app).get(`/companies/sonys`);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.company[0].description).toEqual("Sony Entertainment");
+  });
+});
+
 describe("POST /companies", async function () {
   beforeEach(async function () {
     await db.query("DELETE FROM companies");
