@@ -12,6 +12,16 @@ router.get("/", async function (req, res, next) {
   }
 });
 
+// Get company by handle.
+router.get("/:handle", async function (req, res, next) {
+  try {
+    let company = await Company.get(req.params.handle);
+    return res.status(200).json({ company: company });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 // Create a company
 router.post("/", async function (req, res, next) {
   try {

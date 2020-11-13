@@ -49,6 +49,16 @@ class Company {
     );
     return result.rows;
   }
+
+  static async get(handle) {
+    const result = await db.query(
+      `SELECT handle, name
+      FROM companies
+      WHERE handle = $1`,
+      [handle]
+    );
+    return result.rows;
+  }
 }
 
 module.exports = Company;
