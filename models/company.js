@@ -2,7 +2,7 @@ const db = require("../db");
 
 class Company {
   /** Find all companies (can filter on terms in data). */
-  static async getAll() {
+  static async getAll(data) {
     let baseQuery = `SELECT handle, name FROM companies`;
     let whereExpressions = [];
     let queryValues = [];
@@ -33,7 +33,6 @@ class Company {
     }
 
     // Finalize query and return results
-
     let finalQuery =
       baseQuery + whereExpressions.join(" AND ") + " ORDER BY name";
     const companiesRes = await db.query(finalQuery, queryValues);
