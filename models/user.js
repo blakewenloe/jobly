@@ -58,6 +58,7 @@ class User {
       WHERE username = $1`,
       [username]
     );
+
     return result.rows;
   }
 

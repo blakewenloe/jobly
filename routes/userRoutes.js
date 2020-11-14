@@ -31,15 +31,13 @@ router.get("/:username", ensureCorrectUser, async (req, res, next) => {
 
 // Update a user.
 router.patch("/:username", ensureCorrectUser, async (req, res, next) => {
-  const result = jsonschema.validate(req.body, userSchema);
-  if (!result.valid) {
-    // pass validation errors to error username
-    //  (the "stack" key is generally the most useful)
-    let listOfErrors = result.errors.map((error) => error.stack);
-    let error = new ExpressError(listOfErrors, 400);
-    return next(error);
-  }
   try {
+    const result = jsonschema.validate(req.body, userSchema);
+    if (!result.valid) {
+      let listOfErrors = result.errors.map((error) => error.stack);
+      let error = new ExpressError(listOfErrors, 400);
+      return next(error);
+    }
     let user = await User.update(req.params.username, req.body);
     return res.status(200).json({ user: user });
   } catch (err) {

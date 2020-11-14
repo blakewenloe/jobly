@@ -12,7 +12,7 @@
  *
  */
 
-function sqlForPartialUpdate(table, items, key, id) {
+const sqlForPartialUpdate = (table, items, key, id) => {
   // keep track of item indexes
   // store all the columns we want to update and associate with vals
 
@@ -39,6 +39,6 @@ function sqlForPartialUpdate(table, items, key, id) {
   values.push(id);
 
   return { query, values };
-}
+};
 
 module.exports = sqlForPartialUpdate;
