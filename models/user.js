@@ -24,7 +24,7 @@ class User {
     const result = await db.query(
       `INSERT INTO users (username, password, first_name, last_name, email, is_admin)
                VALUES ($1, $2, $3, $4, $5, $6)
-               RETURNING *`,
+               RETURNING username, first_name, last_name, email, is_admin`,
       [username, hashedPassword, first_name, last_name, email, is_admin]
     );
     let payload = { username, is_admin };
