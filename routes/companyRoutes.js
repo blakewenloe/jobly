@@ -4,9 +4,10 @@ const ExpressError = require("../helpers/ExpressError");
 const jsonschema = require("jsonschema");
 const companySchema = require("../schemas/companySchema.json");
 const Company = require("../models/company");
+const { ensureLoggedIn } = require("../middleware/auth");
 
 // Get list of companies.
-router.get("/", async (req, res, next) => {
+router.get("/", ensureLoggedIn, async (req, res, next) => {
   try {
     let companies = await Company.getAll(req.query);
     return res.status(200).json({ companies: companies });
@@ -16,7 +17,7 @@ router.get("/", async (req, res, next) => {
 });
 
 // Get company by handle.
-router.get("/:handle", async (req, res, next) => {
+router.get("/:handle", ensureLoggedIn, async (req, res, next) => {
   try {
     let company = await Company.get(req.params.handle);
     if (company.length === 0) {

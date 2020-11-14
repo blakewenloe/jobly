@@ -8,8 +8,8 @@
     "examples": [
         {
             "username": "appleslicer",
-            "first_name": "apple",
             "password": "F$@$#FWERF#$%RW",
+            "first_name": "apple",
             "last_name": "slicer",
             "email": "appleslicer2@gmail.com",
             "photo_url": "https://jsonschema.net/assets/svg/logo_blue.svg"

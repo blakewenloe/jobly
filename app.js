@@ -7,7 +7,7 @@ const companiesRoute = require("./routes/companyRoutes");
 const jobsRoute = require("./routes/jobRoutes");
 const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/auth");
-
+const { authenticateJWT } = require("./middleware/auth");
 const morgan = require("morgan");
 
 app.use(express.json());
@@ -15,11 +15,14 @@ app.use(express.json());
 // add logging system
 app.use(morgan("tiny"));
 
+// Use middleware
+app.use(authenticateJWT);
+
 // Use routes
+app.use("/", authRoutes);
 app.use("/companies", companiesRoute);
 app.use("/jobs", jobsRoute);
 app.use("/users", userRoutes);
-app.use("/", authRoutes);
 
 /** 404 handler */
 

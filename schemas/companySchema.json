@@ -7,8 +7,8 @@
     "default": {},
     "examples": [
         {
-            "handle": "sonys",
-            "name": "Sonys",
+            "handle": "sony",
+            "name": "Sony",
             "num_employees": 500,
             "description": "Sony Entertainment",
             "logo_url": "https://www.sony.net/top/2017/img/icon/top-og.jpg"

@@ -4,9 +4,10 @@ const ExpressError = require("../helpers/ExpressError");
 const jsonschema = require("jsonschema");
 const jobSchema = require("../schemas/jobSchema.json");
 const Job = require("../models/job");
+const { ensureLoggedIn } = require("../middleware/auth");
 
 // Get list of jobs.
-router.get("/", async (req, res, next) => {
+router.get("/", ensureLoggedIn, async (req, res, next) => {
   try {
     let jobs = await Job.getAll(req.query);
     return res.status(200).json({ jobs: jobs });
@@ -16,7 +17,7 @@ router.get("/", async (req, res, next) => {
 });
 
 // Get job by id.
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", ensureLoggedIn, async (req, res, next) => {
   try {
     let job = await Job.get(req.params.id);
     if (job.length === 0) {

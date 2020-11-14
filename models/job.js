@@ -2,7 +2,7 @@ const db = require("../db");
 const ExpressError = require("../helpers/ExpressError");
 
 class Job {
-  /** Find all jobs (can filter on terms in data). */
+  // Find all jobs (can filter on terms in data)
   static async getAll(data) {
     let baseQuery = `SELECT id, title, salary, equity, company_handle FROM jobs`;
     let whereExpressions = [];
@@ -31,7 +31,6 @@ class Job {
     }
 
     // Finalize query and return results
-
     let finalQuery = baseQuery + whereExpressions.join(" AND ");
     const jobsRes = await db.query(finalQuery, queryValues);
     return jobsRes.rows;
