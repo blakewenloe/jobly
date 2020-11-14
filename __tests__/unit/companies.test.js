@@ -1,7 +1,6 @@
 const app = require("../../app");
 const request = require("supertest");
 const db = require("../../db");
-process.env.NODE_ENV = "test";
 
 describe("GET /companies", function () {
   test("Gets a list of companies", async function () {
@@ -21,7 +20,7 @@ describe("GET /companies/:handle", function () {
     });
     const response = await request(app).get(`/companies/sonys`);
     expect(response.statusCode).toBe(200);
-    expect(response.body.company[0].description).toEqual("Sony Entertainment");
+    expect(response.body.company.description).toEqual("Sony Entertainment");
   });
 });
 

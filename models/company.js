@@ -67,7 +67,7 @@ class Company {
       [handle]
     );
     if (companyResult.rows.length === 0) {
-      throw new ExpressError(`No company found for ${code}`, 404);
+      throw new ExpressError(`No company found for ${handle}`, 404);
     }
     const company = companyResult.rows[0];
     const jobs = jobsResults.rows;
