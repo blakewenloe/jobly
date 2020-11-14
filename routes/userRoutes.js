@@ -19,7 +19,7 @@ router.get("/", async (req, res, next) => {
 // Get user by username.
 router.get("/:username", ensureCorrectUser, async (req, res, next) => {
   try {
-    let user = await User.get(req.params.username);
+    let user = await User.getUser(req.params.username);
     if (user.length === 0) {
       throw new ExpressError(`${req.params.username} not found`, 404);
     }

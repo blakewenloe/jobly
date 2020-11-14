@@ -17,6 +17,18 @@ class User {
     return results.rows;
   }
 
+  // Get user by username
+  static async getUser(username) {
+    const result = await db.query(
+      `SELECT username, first_name, last_name, email, photo_url
+        FROM users
+        WHERE username = $1`,
+      [username]
+    );
+
+    return result.rows;
+  }
+
   // Register user
   static async register(data) {
     const { username, password, first_name, last_name, email, is_admin } = data;
@@ -42,24 +54,12 @@ class User {
     let user = result.rows[0];
     if (user) {
       if ((await bcrypt.compare(password, user.password)) === true) {
-        let payload = { username: user.username, is_admin: user.is_admin };
+        let payload = { username: username, is_admin: user.is_admin };
         let token = jwt.sign(payload, SECRET_KEY, JWT_OPTIONS);
         return token;
       }
     }
     throw new ExpressError("Invalid user/password", 400);
-  }
-
-  // Get user by id
-  static async get(username) {
-    const result = await db.query(
-      `SELECT username, first_name, last_name, email, photo_url
-      FROM users
-      WHERE username = $1`,
-      [username]
-    );
-
-    return result.rows;
   }
 
   // Update user
