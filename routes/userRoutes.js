@@ -63,6 +63,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+//Delete a user
 router.delete("/:username", ensureCorrectUser, async (req, res, next) => {
   try {
     await User.delete(req.params.username);

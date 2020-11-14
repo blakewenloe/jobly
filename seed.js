@@ -35,7 +35,7 @@ const DDL = `
       job_id INTEGER  REFERENCES jobs (id) ON DELETE CASCADE,
       state TEXT,
       created_at TIMESTAMP DEFAULT NOW(),
-      PRIMARY KEY (username, job_id)
+      PRIMARY KEY(username, job_id) ON CONFLICT DO NOTHING
   );`;
 
 async function seedData() {

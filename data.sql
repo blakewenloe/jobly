@@ -26,5 +26,5 @@ CREATE TABLE applications(
     job_id INTEGER REFERENCES jobs ON DELETE CASCADE,
     state TEXT,
     created_at TIMESTAMP DEFAULT current_timestamp,
-    PRIMARY KEY(username, job_id)
+    PRIMARY KEY(username, job_id) ON CONFLICT DO NOTHING
 );

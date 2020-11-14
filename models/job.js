@@ -74,6 +74,8 @@ class Job {
     }
     return result.rows;
   }
+
+  // Delete job
   static async delete(id) {
     const result = await db.query(
       `
@@ -84,6 +86,18 @@ class Job {
     );
 
     return result.rows;
+  }
+  // Apply user for a job
+  static async apply(userName, jobId) {
+    const result = await db.query(
+      `
+    INSERT INTO applications(username, job_id, state)
+    VALUES($1, $2, $3)
+    RETURNING state`,
+      [userName, jobId, "applied"]
+    );
+
+    return result.rows[0].state;
   }
 }
 

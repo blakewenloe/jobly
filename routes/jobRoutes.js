@@ -4,7 +4,11 @@ const ExpressError = require("../helpers/ExpressError");
 const jsonschema = require("jsonschema");
 const jobSchema = require("../schemas/jobSchema.json");
 const Job = require("../models/job");
-const { ensureAdmin, ensureLoggedIn } = require("../middleware/auth");
+const {
+  ensureAdmin,
+  ensureLoggedIn,
+  ensureCorrectUser,
+} = require("../middleware/auth");
 
 // Get list of jobs.
 router.get("/", ensureLoggedIn, async (req, res, next) => {
@@ -49,7 +53,7 @@ router.patch("/:id", ensureAdmin, async (req, res, next) => {
 });
 
 // Create a job
-router.post("/", ensureAdmin, async (req, res, next) => {
+router.post("/", ensureLoggedIn, async (req, res, next) => {
   const result = jsonschema.validate(req.body, jobSchema);
   if (!result.valid) {
     // pass validation errors to error idr
@@ -66,6 +70,19 @@ router.post("/", ensureAdmin, async (req, res, next) => {
   }
 });
 
+//Apply to a job
+router.post("/:id/apply", ensureLoggedIn, async (req, res, next) => {
+  try {
+    let jobId = req.params.id;
+    let userName = req.body.username;
+    let application = await Job.apply(userName, jobId);
+    return res.status(201).json({ message: application });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// Delete a job
 router.delete("/:id", ensureAdmin, async (req, res, next) => {
   try {
     await Job.delete(req.params.id);
