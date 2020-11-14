@@ -1,6 +1,5 @@
 const Router = require("express").Router;
 const router = new Router();
-const db = require("../db");
 const ExpressError = require("../helpers/ExpressError");
 const User = require("../models/user");
 
@@ -20,7 +19,6 @@ router.post("/login", async function (req, res, next) {
   try {
     const login = await User.login(req.body);
     return res.status(200).json({ token: login });
-    // throw new ExpressError("Invalid user/password", 400);
   } catch (err) {
     return next(err);
   }
