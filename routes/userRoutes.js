@@ -4,6 +4,7 @@ const ExpressError = require("../helpers/ExpressError");
 const jsonschema = require("jsonschema");
 const userSchema = require("../schemas/userSchema.json");
 const User = require("../models/user");
+const { ensureCorrectUser } = require("../middleware/auth");
 
 // Get list of users.
 router.get("/", async (req, res, next) => {
@@ -16,7 +17,7 @@ router.get("/", async (req, res, next) => {
 });
 
 // Get user by username.
-router.get("/:username", async (req, res, next) => {
+router.get("/:username", ensureCorrectUser, async (req, res, next) => {
   try {
     let user = await User.get(req.params.username);
     if (user.length === 0) {
@@ -29,7 +30,7 @@ router.get("/:username", async (req, res, next) => {
 });
 
 // Update a user.
-router.patch("/:username", async (req, res, next) => {
+router.patch("/:username", ensureCorrectUser, async (req, res, next) => {
   const result = jsonschema.validate(req.body, userSchema);
   if (!result.valid) {
     // pass validation errors to error username
@@ -57,14 +58,14 @@ router.post("/", async (req, res, next) => {
     return next(error);
   }
   try {
-    let newUser = await User.add(req.body);
+    let newUser = await User.register(req.body);
     return res.status(201).json({ user: newUser });
   } catch (err) {
     return next(err);
   }
 });
 
-router.delete("/:username", async (req, res, next) => {
+router.delete("/:username", ensureCorrectUser, async (req, res, next) => {
   try {
     await User.delete(req.params.username);
     return res.status(200).json({ message: `${req.params.username} deleted` });

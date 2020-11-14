@@ -4,7 +4,7 @@ const ExpressError = require("../helpers/ExpressError");
 const jsonschema = require("jsonschema");
 const companySchema = require("../schemas/companySchema.json");
 const Company = require("../models/company");
-const { ensureLoggedIn } = require("../middleware/auth");
+const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
 
 // Get list of companies.
 router.get("/", ensureLoggedIn, async (req, res, next) => {
@@ -30,7 +30,7 @@ router.get("/:handle", ensureLoggedIn, async (req, res, next) => {
 });
 
 // Update a company.
-router.patch("/:handle", async (req, res, next) => {
+router.patch("/:handle", ensureAdmin, async (req, res, next) => {
   const result = jsonschema.validate(req.body, companySchema);
   if (!result.valid) {
     // pass validation errors to error handler
@@ -48,7 +48,7 @@ router.patch("/:handle", async (req, res, next) => {
 });
 
 // Create a company
-router.post("/", async (req, res, next) => {
+router.post("/", ensureAdmin, async (req, res, next) => {
   const result = jsonschema.validate(req.body, companySchema);
   if (!result.valid) {
     // pass validation errors to error handler
@@ -65,7 +65,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.delete("/:handle", async (req, res, next) => {
+router.delete("/:handle", ensureAdmin, async (req, res, next) => {
   try {
     await Company.delete(req.params.handle);
     return res.status(200).json({ message: `${req.params.handle} deleted` });
