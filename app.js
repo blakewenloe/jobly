@@ -3,7 +3,10 @@
 const express = require("express");
 const app = express();
 const ExpressError = require("./helpers/expressError");
-const companiesRoute = require("./routes/companiesRoute");
+const companiesRoute = require("./routes/companyRoutes");
+const jobsRoute = require("./routes/jobRoutes");
+const userRoutes = require("./routes/userRoutes");
+
 const morgan = require("morgan");
 
 app.use(express.json());
@@ -13,6 +16,9 @@ app.use(morgan("tiny"));
 
 // Use routes
 app.use("/companies", companiesRoute);
+app.use("/jobs", jobsRoute);
+app.use("/users", userRoutes);
+
 /** 404 handler */
 
 app.use(function (req, res, next) {

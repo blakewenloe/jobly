@@ -1,7 +1,7 @@
 const db = require("../db");
 const ExpressError = require("../ExpressError");
 class Company {
-  /** Find all companies (can filter on terms in data). */
+  // Find all companies (can filter on terms in data).
   static async getAll(data) {
     let baseQuery = `SELECT handle, name FROM companies`;
     let whereExpressions = [];
@@ -39,6 +39,7 @@ class Company {
     return companiesRes.rows;
   }
 
+  // Add company
   static async add(data) {
     let { handle, name, num_employees, description, logo_url } = data;
     const result = await db.query(
@@ -50,16 +51,31 @@ class Company {
     return result.rows;
   }
 
+  // Get company by handle
   static async get(handle) {
-    const result = await db.query(
+    const companyResult = await db.query(
       `SELECT handle, name, num_employees, description, logo_url
       FROM companies
       WHERE handle = $1`,
       [handle]
     );
-    return result.rows;
+    const jobsResults = await db.query(
+      `
+    SELECT title, salary, equity
+    FROM jobs
+    WHERE company_handle = $1`,
+      [handle]
+    );
+    if (companyResult.rows.length === 0) {
+      throw new ExpressError(`No company found for ${code}`, 404);
+    }
+    const company = companyResult.rows[0];
+    const jobs = jobsResults.rows;
+    company.jobs = jobs.map((job) => job);
+    return company;
   }
 
+  // Update company
   static async update(handle, data) {
     let { num_employees, description, logo_url } = data;
     const result = await db.query(

@@ -1,11 +1,11 @@
 CREATE TABLE users (
-    id text PRIMARY KEY,
-    username text NOT NULL,
+    username text PRIMARY KEY,
     password text NOT NULL,
     first_name text NOT NULL,
     last_name text NOT NULL,
-    phone text NOT NULL,
-    join_at timestamp without time zone NOT NULL
+    email text NOT NULL UNIQUE,
+    photo_url text,
+    is_admin boolean NOT NULL DEFAULT FALSE
 );
 CREATE TABLE companies (
     handle text PRIMARY KEY,
@@ -21,4 +21,4 @@ CREATE TABLE jobs(
     equity float CHECK (equity <= 1) NOT NULL,
     company_handle text REFERENCES companies(handle) ON DELETE CASCADE,
     date_posted TIMESTAMPTZ NOT NULL DEFAULT NOW()
-)
+);
