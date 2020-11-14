@@ -2,44 +2,43 @@ const app = require("../../app");
 const request = require("supertest");
 const db = require("../../db");
 
-describe("GET /companies", function () {
-  test("Gets a list of companies", async function () {
+describe("DELETE /companies", async function () {
+  test("Deletes a company", async () => {
+    await request(app).delete(`/companies/sonys`);
+    let checkIfCompanyExists = await request(app).get(`/companies/gamestop`);
+    expect(checkIfCompanyExists.statusCode).toBe(404);
+  });
+});
+
+describe("POST /companies", async function () {
+  beforeEach(async () => {
+    await db.query(`DELETE FROM companies WHERE handle='IP'`);
+  });
+  test("Creates a new company", async () => {
+    const response = await request(app).post(`/companies`).send({
+      handle: "IP",
+      name: "IP",
+      num_employees: 5,
+      description: "GameStop and Fun",
+      logo_url: "top-og.jpg",
+    });
+
+    expect(response.body.company[0].name).toEqual("IP");
+  });
+});
+
+describe("GET /companies", async function () {
+  test("Gets a list of companies", async () => {
     const response = await request(app).get(`/companies`);
     expect(response.statusCode).toBe(200);
   });
 });
 
-describe("GET /companies/:handle", function () {
-  test("Gets a company by handle", async function () {
-    await request(app).post(`/companies`).send({
-      handle: "sonys",
-      name: "Sonys",
-      num_employees: 500,
-      description: "Sony Entertainment",
-      logo_url: "https://www.sony.net/top/2017/img/icon/top-og.jpg",
-    });
+describe("GET /companies/:handle", async function () {
+  test("Gets a company by handle", async () => {
     const response = await request(app).get(`/companies/sonys`);
     expect(response.statusCode).toBe(200);
-    expect(response.body.company.description).toEqual("Sony Entertainment");
-  });
-});
-
-describe("POST /companies", async function () {
-  beforeEach(async function () {
-    await db.query("DELETE FROM companies");
-  });
-  test("Creates a new company", async () => {
-    const response = await request(app).post(`/companies`).send({
-      handle: "sonys",
-      name: "Sonys",
-      num_employees: 500,
-      description: "Sony Entertainment",
-      logo_url: "https://www.sony.net/top/2017/img/icon/top-og.jpg",
-    });
-
-    expect(response.statusCode).toBe(201);
-    expect(response.body.company[0]).toHaveProperty("handle", "sonys");
-    expect(response.body.company[0]).toHaveProperty("num_employees", 500);
+    expect(response.body.company.description).toEqual("Games and Fun");
   });
 });
 
@@ -47,21 +46,16 @@ describe("PATCH /companies", async function () {
   test("Updates a company", async () => {
     const response = await request(app).patch(`/companies/sonys`).send({
       handle: "sonys",
-      name: "Sonys",
-      num_employees: 122,
-      description: "Sony",
-      logo_url: "https://www.sony.net/top/2017/img/icon/top-og.jpg",
+      name: "GameStop",
+      num_employees: 545,
+      description: "Games and Fun",
+      logo_url: "top-of.jpg",
     });
     expect(response.statusCode).toBe(200);
-    expect(response.body.company[0]).toHaveProperty("description", "Sony");
-    expect(response.body.company[0]).toHaveProperty("num_employees", 122);
-  });
-});
-
-describe("DELETE /companies", async function () {
-  test("Deletes a company", async () => {
-    await request(app).delete(`/companies/sonys`);
-    const deletedCompany = await request(app).get(`/companies/sonys`);
-    expect(deletedCompany.statusCode).toBe(404);
+    expect(response.body.company[0]).toHaveProperty(
+      "description",
+      "Games and Fun"
+    );
+    expect(response.body.company[0]).toHaveProperty("num_employees", 545);
   });
 });

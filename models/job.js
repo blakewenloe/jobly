@@ -1,10 +1,10 @@
 const db = require("../db");
-const ExpressError = require("../ExpressError");
+const ExpressError = require("../helpers/ExpressError");
 
 class Job {
   /** Find all jobs (can filter on terms in data). */
   static async getAll(data) {
-    let baseQuery = `SELECT id, title, salary, equity FROM jobs`;
+    let baseQuery = `SELECT id, title, salary, equity, company_handle FROM jobs`;
     let whereExpressions = [];
     let queryValues = [];
 
@@ -43,7 +43,7 @@ class Job {
     const result = await db.query(
       `INSERT INTO jobs(title, salary, equity, company_handle)
       VALUES($1,$2,$3,$4)
-      RETURNING title, salary, equity, company_handle`,
+      RETURNING id, title, salary, equity, company_handle`,
       [title, salary, equity, company_handle]
     );
     return result.rows;

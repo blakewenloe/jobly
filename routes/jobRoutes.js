@@ -21,8 +21,9 @@ router.get("/:id", async (req, res, next) => {
     let job = await Job.get(req.params.id);
     if (job.length === 0) {
       throw new ExpressError(`${req.params.id} not found`, 404);
+    } else {
+      return res.status(200).json({ job: job });
     }
-    return res.status(200).json({ job: job });
   } catch (err) {
     return next(err);
   }

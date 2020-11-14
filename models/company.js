@@ -1,5 +1,6 @@
 const db = require("../db");
-const ExpressError = require("../ExpressError");
+const ExpressError = require("../helpers/ExpressError");
+
 class Company {
   // Find all companies (can filter on terms in data).
   static async getAll(data) {
@@ -77,13 +78,13 @@ class Company {
 
   // Update company
   static async update(handle, data) {
-    let { num_employees, description, logo_url } = data;
+    let { name, num_employees, description, logo_url } = data;
     const result = await db.query(
       `UPDATE companies
-      SET num_employees=$1, description=$2, logo_url=$3
-      WHERE handle = $4
-      RETURNING num_employees, description, logo_url`,
-      [num_employees, description, logo_url, handle]
+      SET name=$1, num_employees=$2, description=$3, logo_url=$4
+      WHERE handle = $5
+      RETURNING handle, name, num_employees, description, logo_url`,
+      [name, num_employees, description, logo_url, handle]
     );
     if (result.rows.length === 0) {
       throw new ExpressError(`${handle} does not exist`, 404);
@@ -92,10 +93,8 @@ class Company {
   }
   static async delete(handle) {
     const result = await db.query(
-      `
-    DELETE FROM companies
-    WHERE handle = $1
-    `,
+      `DELETE FROM companies
+      WHERE handle = $1`,
       [handle]
     );
 

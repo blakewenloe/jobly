@@ -1,5 +1,5 @@
 const db = require("../db");
-const ExpressError = require("../ExpressError");
+const ExpressError = require("../helpers/ExpressError");
 
 class User {
   // Find all users
