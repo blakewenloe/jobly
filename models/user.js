@@ -19,14 +19,28 @@ class User {
 
   // Get user by username
   static async getUser(username) {
-    const result = await db.query(
+    const userResult = await db.query(
       `SELECT username, first_name, last_name, email, photo_url
-        FROM users
-        WHERE username = $1`,
+      FROM users
+      WHERE username = $1`,
       [username]
     );
-
-    return result.rows;
+    const jobResults = await db.query(
+      `
+    SELECT job_id, username, title, salary, equity, company_handle, state, created_at
+    FROM applications AS "a"
+    JOIN jobs AS "j"
+    ON a.job_id=j.id
+    WHERE username = $1`,
+      [username]
+    );
+    if (userResult.rows.length === 0) {
+      throw new ExpressError(`${username} does not exist`, 404);
+    }
+    const user = userResult.rows[0];
+    const jobs = jobResults.rows;
+    user.jobs = jobs.map((job) => job);
+    return user;
   }
 
   // Register user
