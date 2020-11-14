@@ -1,24 +1,30 @@
-CREATE TABLE users (
-    username text PRIMARY KEY,
-    password text NOT NULL,
-    first_name text NOT NULL,
-    last_name text NOT NULL,
-    email text NOT NULL UNIQUE,
-    photo_url text,
-    is_admin boolean NOT NULL DEFAULT FALSE
+CREATE TABLE companies(
+    handle TEXT PRIMARY KEY,
+    name TEXT UNIQUE NOT NULL,
+    num_employees INTEGER,
+    description TEXT,
+    logo_url TEXT
 );
-CREATE TABLE companies (
-    handle text PRIMARY KEY,
-    name text NOT NULL UNIQUE,
-    num_employees int,
-    description text,
-    logo_url text
+CREATE TABLE users(
+    username TEXT PRIMARY KEY,
+    password TEXT NOT NULL,
+    first_name TEXT,
+    last_name TEXT,
+    email TEXT,
+    photo_url TEXT,
+    is_admin BOOLEAN NOT NULL default FALSE
 );
 CREATE TABLE jobs(
-    id SERIAL PRIMARY key,
-    title text NOT NULL,
-    salary float NOT NULL,
-    equity float CHECK (equity <= 1) NOT NULL,
-    company_handle text REFERENCES companies(handle) ON DELETE CASCADE,
-    date_posted TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    salary FLOAT,
+    equity FLOAT CHECK(equity <= 1.0),
+    company_handle TEXT NOT NULL REFERENCES companies ON DELETE CASCADE
+);
+CREATE TABLE applications(
+    username TEXT NOT NULL REFERENCES users ON DELETE CASCADE,
+    job_id INTEGER REFERENCES jobs ON DELETE CASCADE,
+    state TEXT,
+    created_at TIMESTAMP DEFAULT current_timestamp,
+    PRIMARY KEY(username, job_id)
 );
