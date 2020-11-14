@@ -8,7 +8,7 @@ const User = require("../models/user");
 // Get list of users.
 router.get("/", async (req, res, next) => {
   try {
-    let users = await User.getAll(req.query);
+    let users = await User.getAll();
     return res.status(200).json({ users: users });
   } catch (err) {
     return next(err);
@@ -32,7 +32,7 @@ router.get("/:username", async (req, res, next) => {
 router.patch("/:username", async (req, res, next) => {
   const result = jsonschema.validate(req.body, userSchema);
   if (!result.valid) {
-    // pass validation errors to error usernamer
+    // pass validation errors to error username
     //  (the "stack" key is generally the most useful)
     let listOfErrors = result.errors.map((error) => error.stack);
     let error = new ExpressError(listOfErrors, 400);
@@ -50,7 +50,7 @@ router.patch("/:username", async (req, res, next) => {
 router.post("/", async (req, res, next) => {
   const result = jsonschema.validate(req.body, userSchema);
   if (!result.valid) {
-    // pass validation errors to error usernamer
+    // pass validation errors to error username
     //  (the "stack" key is generally the most useful)
     let listOfErrors = result.errors.map((error) => error.stack);
     let error = new ExpressError(listOfErrors, 400);

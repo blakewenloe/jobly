@@ -4,10 +4,9 @@ const ExpressError = require("../helpers/ExpressError");
 class User {
   // Find all users
   static async getAll() {
-    let results = db.query(
+    let results = await db.query(
       `SELECT username, first_name, last_name, email, photo_url
-      FROM users
-      RETURNING username, first_name, last_name, email, photo_url`
+      FROM users`
     );
     return results.rows;
   }
