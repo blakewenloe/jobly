@@ -1,5 +1,5 @@
 const db = require("../db");
-const ExpressError = require("../helpers/ExpressError");
+const ExpressError = require("../helpers/expressError");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
