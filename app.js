@@ -16,7 +16,7 @@ app.use(morgan("tiny"));
 
 // Use middleware
 app.use(authenticateJWT);
-app.use(jwt);
+app.use(jwt());
 // Use routes
 app.use("/", authRoutes);
 app.use("/companies", companiesRoute);
