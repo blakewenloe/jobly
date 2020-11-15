@@ -24,6 +24,15 @@
       "maxLength": 55,
       "examples": ["rithm"]
     },
+    "description": {
+      "$id": "/properties/description",
+      "type": "string",
+      "title": "The description Schema ",
+      "default": "",
+      "minLength": 1,
+      "maxLength": 55,
+      "examples": ["Apple company description"]
+    },
     "logo": {
       "$id": "/properties/logo",
       "type": "string",

@@ -66,6 +66,8 @@ class User {
   // Login user
   static async login(data) {
     const { username, password } = data;
+    console.log(bcrypt.hashSync("Unl0ck3d", salt));
+
     const result = await db.query(
       `SELECT password, is_admin FROM users WHERE username = $1`,
       [username]
