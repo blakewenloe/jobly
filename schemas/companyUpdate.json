@@ -24,6 +24,15 @@
       "maxLength": 55,
       "examples": ["rithm"]
     },
+    "num_employees": {
+      "$id": "/properties/num_employees",
+      "type": "number",
+      "title": "The num_employees Schema",
+      "default": 1,
+      "minLength": 1,
+      "maxLength": 55,
+      "examples": ["rithm"]
+    },
     "description": {
       "$id": "/properties/description",
       "type": "string",
