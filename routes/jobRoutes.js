@@ -1,19 +1,16 @@
 const Router = require("express").Router;
 const router = new Router();
 const ExpressError = require("../helpers/ExpressError");
-const jsonschema = require("jsonschema");
-const jobSchema = require("../schemas/jobSchema.json");
+const { validate } = require("jsonschema");
+const jobNewSchema = require("../schemas/jobNew.json");
+const jobUpdateSchema = require("../schemas/jobUpdate.json");
 const Job = require("../models/job");
-const {
-  ensureAdmin,
-  ensureLoggedIn,
-  ensureCorrectUser,
-} = require("../middleware/auth");
+const { ensureAdmin, ensureLoggedIn } = require("../middleware/auth");
 
 // Get list of jobs.
 router.get("/", ensureLoggedIn, async (req, res, next) => {
   try {
-    let jobs = await Job.getAll(req.query);
+    const jobs = await Job.getAllJobs(req.query);
     return res.status(200).json({ jobs: jobs });
   } catch (err) {
     return next(err);
@@ -23,12 +20,8 @@ router.get("/", ensureLoggedIn, async (req, res, next) => {
 // Get job by id.
 router.get("/:id", ensureLoggedIn, async (req, res, next) => {
   try {
-    let job = await Job.get(req.params.id);
-    if (job.length === 0) {
-      throw new ExpressError(`${req.params.id} not found`, 404);
-    } else {
-      return res.status(200).json({ job: job });
-    }
+    const job = await Job.getJob(req.params.id);
+    return res.json({ job });
   } catch (err) {
     return next(err);
   }
@@ -36,17 +29,21 @@ router.get("/:id", ensureLoggedIn, async (req, res, next) => {
 
 // Update a job.
 router.patch("/:id", ensureAdmin, async (req, res, next) => {
-  const result = jsonschema.validate(req.body, jobSchema);
-  if (!result.valid) {
-    // pass validation errors to error idr
-    //  (the "stack" key is generally the most useful)
-    let listOfErrors = result.errors.map((error) => error.stack);
-    let error = new ExpressError(listOfErrors, 400);
-    return next(error);
-  }
   try {
-    let job = await Job.update(req.params.id, req.body);
-    return res.status(200).json({ job: job });
+    if ("id" in req.body) {
+      throw new ExpressError("You are not allowed to change the ID", 400);
+    }
+
+    const validation = validate(req.body, jobUpdateSchema);
+    if (!validation.valid) {
+      throw new ExpressError(
+        validation.errors.map((e) => e.stack),
+        400
+      );
+    }
+
+    const job = await Job.update(req.params.id, req.body);
+    return res.json({ job });
   } catch (err) {
     return next(err);
   }
@@ -54,16 +51,15 @@ router.patch("/:id", ensureAdmin, async (req, res, next) => {
 
 // Create a job
 router.post("/", ensureLoggedIn, async (req, res, next) => {
-  const result = jsonschema.validate(req.body, jobSchema);
+  const result = validate(req.body, jobNewSchema);
   if (!result.valid) {
-    // pass validation errors to error idr
-    //  (the "stack" key is generally the most useful)
-    let listOfErrors = result.errors.map((error) => error.stack);
-    let error = new ExpressError(listOfErrors, 400);
+    const listOfErrors = result.errors.map((error) => error.stack);
+    const error = new ExpressError(listOfErrors, 400);
     return next(error);
   }
+
   try {
-    let newJob = await Job.add(req.body);
+    const newJob = await Job.addJob(req.body);
     return res.status(201).json({ job: newJob });
   } catch (err) {
     return next(err);
@@ -73,9 +69,9 @@ router.post("/", ensureLoggedIn, async (req, res, next) => {
 //Apply to a job
 router.post("/:id/apply", ensureLoggedIn, async (req, res, next) => {
   try {
-    let jobId = req.params.id;
-    let userName = req.body.username;
-    let application = await Job.apply(userName, jobId);
+    const userName = req.body.username;
+    const jobId = req.params.id;
+    const application = await Job.applyToJob(userName, jobId);
     return res.status(201).json({ message: application });
   } catch (err) {
     return next(err);
@@ -85,10 +81,10 @@ router.post("/:id/apply", ensureLoggedIn, async (req, res, next) => {
 // Delete a job
 router.delete("/:id", ensureAdmin, async (req, res, next) => {
   try {
-    await Job.delete(req.params.id);
+    await Job.deleteJob(req.params.id);
     return res.status(200).json({ message: `${req.params.id} deleted` });
-  } catch (e) {
-    return next(e);
+  } catch (err) {
+    return next(err);
   }
 });
 

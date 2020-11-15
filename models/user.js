@@ -9,7 +9,7 @@ const JWT_OPTIONS = { expiresIn: 60 * 60 };
 
 class User {
   // Get all users
-  static async getAll() {
+  static async getUsers() {
     let results = await db.query(
       `SELECT username, first_name, last_name, email, photo_url
       FROM users`
@@ -25,26 +25,28 @@ class User {
       WHERE username = $1`,
       [username]
     );
+
     const jobResults = await db.query(
-      `
-    SELECT job_id, username, title, salary, equity, company_handle, state, created_at
-    FROM applications AS "a"
-    JOIN jobs AS "j"
-    ON a.job_id=j.id
-    WHERE username = $1`,
+      `SELECT job_id, username, title, salary, equity, company_handle, state, created_at
+      FROM applications AS "a"
+      JOIN jobs AS "j"
+      ON a.job_id=j.id
+      WHERE username = $1`,
       [username]
     );
-    if (userResult.rows.length === 0) {
+
+    const user = userResult.rows[0];
+
+    if (!user) {
       throw new ExpressError(`${username} does not exist`, 404);
     }
-    const user = userResult.rows[0];
     const jobs = jobResults.rows;
     user.jobs = jobs.map((job) => job);
     return user;
   }
 
   // Register user
-  static async register(data) {
+  static async registerUser(data) {
     const { username, password, first_name, last_name, email, is_admin } = data;
     const hashedPassword = await bcrypt.hashSync(password, salt);
     const result = await db.query(
@@ -53,9 +55,12 @@ class User {
                RETURNING username, first_name, last_name, email, is_admin`,
       [username, hashedPassword, first_name, last_name, email, is_admin]
     );
-    let payload = { username, is_admin };
-    let token = jwt.sign(payload, SECRET_KEY, JWT_OPTIONS);
-    return { token: token };
+    const registeredUser = result.rows[0];
+    if (registeredUser) {
+      let payload = { username, is_admin };
+      let token = jwt.sign(payload, SECRET_KEY, JWT_OPTIONS);
+      return { token: token };
+    }
   }
 
   // Login user
@@ -66,18 +71,18 @@ class User {
       [username]
     );
     let user = result.rows[0];
-    if (user) {
-      if ((await bcrypt.compare(password, user.password)) === true) {
-        let payload = { username: username, is_admin: user.is_admin };
-        let token = jwt.sign(payload, SECRET_KEY, JWT_OPTIONS);
-        return token;
-      }
+    if (!user) {
+      throw new ExpressError("Invalid user/password", 400);
     }
-    throw new ExpressError("Invalid user/password", 400);
+    if ((await bcrypt.compare(password, user.password)) === true) {
+      let payload = { username: username, is_admin: user.is_admin };
+      let token = jwt.sign(payload, SECRET_KEY, JWT_OPTIONS);
+      return token;
+    }
   }
 
   // Update user
-  static async update(username, data) {
+  static async updateUser(username, data) {
     let { first_name, last_name, email, photo_url } = data;
     const result = await db.query(
       `UPDATE users
@@ -86,23 +91,22 @@ class User {
       RETURNING *`,
       [first_name, last_name, email, photo_url, username]
     );
-    if (result.rows.length === 0) {
+    const user = result.rows[0];
+    if (!user) {
       throw new ExpressError(`${username} does not exist`, 404);
     }
-    return result.rows;
+    return user;
   }
 
   // Delete user
-  static async delete(username) {
+  static async deleteUser(username) {
     const result = await db.query(
-      `
-    DELETE FROM users
-    WHERE username = $1
-    `,
+      `DELETE FROM users
+      WHERE username = $1`,
       [username]
     );
 
-    return result.rows;
+    return result.rows[0];
   }
 }
 

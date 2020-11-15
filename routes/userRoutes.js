@@ -1,15 +1,17 @@
 const Router = require("express").Router;
 const router = new Router();
 const ExpressError = require("../helpers/ExpressError");
-const jsonschema = require("jsonschema");
-const userSchema = require("../schemas/userSchema.json");
+const { validate } = require("jsonschema");
+const userNewSchema = require("../schemas/userUpdate.json");
+const userUpdateSchema = require("../schemas/userNew.json");
+
 const User = require("../models/user");
 const { ensureCorrectUser } = require("../middleware/auth");
 
 // Get list of users.
 router.get("/", async (req, res, next) => {
   try {
-    let users = await User.getAll();
+    let users = await User.getUsers();
     return res.status(200).json({ users: users });
   } catch (err) {
     return next(err);
@@ -31,13 +33,13 @@ router.get("/:username", ensureCorrectUser, async (req, res, next) => {
 
 // Update a user.
 router.patch("/:username", ensureCorrectUser, async (req, res, next) => {
+  const result = validate(req.body, userUpdateSchema);
+  if (!result.valid) {
+    let listOfErrors = result.errors.map((error) => error.stack);
+    let error = new ExpressError(listOfErrors, 400);
+    return next(error);
+  }
   try {
-    const result = jsonschema.validate(req.body, userSchema);
-    if (!result.valid) {
-      let listOfErrors = result.errors.map((error) => error.stack);
-      let error = new ExpressError(listOfErrors, 400);
-      return next(error);
-    }
     let user = await User.update(req.params.username, req.body);
     return res.status(200).json({ user: user });
   } catch (err) {
@@ -47,7 +49,7 @@ router.patch("/:username", ensureCorrectUser, async (req, res, next) => {
 
 // Create a user
 router.post("/", async (req, res, next) => {
-  const result = jsonschema.validate(req.body, userSchema);
+  const result = validate(req.body, userNewSchema);
   if (!result.valid) {
     // pass validation errors to error username
     //  (the "stack" key is generally the most useful)
@@ -55,6 +57,7 @@ router.post("/", async (req, res, next) => {
     let error = new ExpressError(listOfErrors, 400);
     return next(error);
   }
+
   try {
     let newUser = await User.register(req.body);
     return res.status(201).json({ user: newUser });
@@ -68,8 +71,8 @@ router.delete("/:username", ensureCorrectUser, async (req, res, next) => {
   try {
     await User.delete(req.params.username);
     return res.status(200).json({ message: `${req.params.username} deleted` });
-  } catch (e) {
-    return next(e);
+  } catch (err) {
+    return next(err);
   }
 });
 

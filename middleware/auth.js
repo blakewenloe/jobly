@@ -15,7 +15,6 @@ const authenticateJWT = (req, res, next) => {
     return next();
   }
 };
-// end
 
 /** Require user or raise 401 */
 const ensureLoggedIn = (req, res, next) => {
@@ -26,18 +25,16 @@ const ensureLoggedIn = (req, res, next) => {
     return next();
   }
 };
-// end
 
 /** Require admin user or raise 401 */
 const ensureAdmin = (req, res, next) => {
-  if (!req.user || req.user.username != "admin") {
+  if (!req.user || !req.user.is_admin) {
     const err = new ExpressError("Unauthorized", 401);
     return next(err);
   } else {
     return next();
   }
 };
-// end
 
 /** Require user is self or raise 401 */
 const ensureCorrectUser = (req, res, next) => {
@@ -52,7 +49,6 @@ const ensureCorrectUser = (req, res, next) => {
     return next({ status: 401, message: "Unauthorized" });
   }
 };
-// end
 
 module.exports = {
   authenticateJWT,

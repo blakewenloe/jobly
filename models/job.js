@@ -3,7 +3,7 @@ const ExpressError = require("../helpers/ExpressError");
 
 class Job {
   // Find all jobs (can filter on terms in data)
-  static async getAll(data) {
+  static async getAllJobs(data) {
     let baseQuery = `SELECT id, title, salary, equity, company_handle FROM jobs`;
     let whereExpressions = [];
     let queryValues = [];
@@ -36,8 +36,8 @@ class Job {
     return jobsRes.rows;
   }
 
-  // Add job
-  static async add(data) {
+  // Add a new job
+  static async addJob(data) {
     let { title, salary, equity, company_handle } = data;
     const result = await db.query(
       `INSERT INTO jobs(title, salary, equity, company_handle)
@@ -48,8 +48,8 @@ class Job {
     return result.rows;
   }
 
-  // Get job by id
-  static async get(id) {
+  // Get a job by its id
+  static async getJob(id) {
     const result = await db.query(
       `SELECT *
       FROM jobs
@@ -59,8 +59,8 @@ class Job {
     return result.rows;
   }
 
-  // Update job
-  static async update(id, data) {
+  // Update an existing job
+  static async updateJob(id, data) {
     let { title, salary, equity, company_handle } = data;
     const result = await db.query(
       `UPDATE jobs
@@ -75,25 +75,23 @@ class Job {
     return result.rows;
   }
 
-  // Delete job
-  static async delete(id) {
+  // Delete a job
+  static async deleteJob(id) {
     const result = await db.query(
-      `
-    DELETE FROM jobs
-    WHERE id = $1
-    `,
+      `DELETE FROM jobs
+       WHERE id = $1`,
       [id]
     );
 
     return result.rows;
   }
-  // Apply user for a job
-  static async apply(userName, jobId) {
+
+  // Apply to a job
+  static async applyToJob(userName, jobId) {
     const result = await db.query(
-      `
-    INSERT INTO applications(username, job_id, state)
-    VALUES($1, $2, $3)
-    RETURNING state`,
+      `INSERT INTO applications(username, job_id, state)
+       VALUES($1, $2, $3)
+       RETURNING state`,
       [userName, jobId, "applied"]
     );
 

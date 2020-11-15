@@ -3,7 +3,7 @@ const ExpressError = require("../helpers/ExpressError");
 
 class Company {
   // Find all companies (can filter on terms in data).
-  static async getAll(data) {
+  static async getCompanies(data) {
     let baseQuery = `SELECT handle, name FROM companies`;
     let whereExpressions = [];
     let queryValues = [];
@@ -40,20 +40,41 @@ class Company {
     return companiesRes.rows;
   }
 
-  // Add company
-  static async add(data) {
-    let { handle, name, num_employees, description, logo_url } = data;
-    const result = await db.query(
-      `INSERT INTO companies(handle, name, num_employees, description, logo_url)
-      VALUES($1,$2,$3,$4,$5)
-      RETURNING handle, name, num_employees, description, logo_url`,
-      [handle, name, num_employees, description, logo_url]
+  // Add a new company
+  static async addCompany(data) {
+    const duplicateCheck = await db.query(
+      `SELECT handle 
+            FROM companies 
+            WHERE handle = $1`,
+      [data.handle]
     );
-    return result.rows;
+
+    if (duplicateCheck.rows[0]) {
+      throw new ExpressError(
+        `There already exists a company with handle '${data.handle}`,
+        400
+      );
+    }
+
+    const result = await db.query(
+      `INSERT INTO companies 
+              (handle, name, num_employees, description, logo_url)
+            VALUES ($1, $2, $3, $4, $5) 
+            RETURNING handle, name, num_employees, description, logo_url`,
+      [
+        data.handle,
+        data.name,
+        data.num_employees,
+        data.description,
+        data.logo_url,
+      ]
+    );
+
+    return result.rows[0];
   }
 
-  // Get company by handle
-  static async get(handle) {
+  // Get company by its handle
+  static async getCompany(handle) {
     const companyResult = await db.query(
       `SELECT handle, name, num_employees, description, logo_url
       FROM companies
@@ -61,23 +82,23 @@ class Company {
       [handle]
     );
     const jobsResults = await db.query(
-      `
-    SELECT title, salary, equity
-    FROM jobs
-    WHERE company_handle = $1`,
+      `SELECT title, salary, equity
+       FROM jobs
+       WHERE company_handle = $1`,
       [handle]
     );
-    if (companyResult.rows.length === 0) {
+
+    const company = companyResult.rows[0];
+    if (!company) {
       throw new ExpressError(`No company found for ${handle}`, 404);
     }
-    const company = companyResult.rows[0];
     const jobs = jobsResults.rows;
     company.jobs = jobs.map((job) => job);
     return company;
   }
 
-  // Update company
-  static async update(handle, data) {
+  // Update a company
+  static async updateCompany(handle, data) {
     let { name, num_employees, description, logo_url } = data;
     const result = await db.query(
       `UPDATE companies
@@ -86,19 +107,27 @@ class Company {
       RETURNING handle, name, num_employees, description, logo_url`,
       [name, num_employees, description, logo_url, handle]
     );
-    if (result.rows.length === 0) {
-      throw new ExpressError(`${handle} does not exist`, 404);
+
+    const company = result.rows[0];
+
+    if (company) {
+      return company;
     }
-    return result.rows;
+    throw new ExpressError(`${handle} does not exist`, 404);
   }
-  static async delete(handle) {
+
+  // Delete a company
+  static async deleteCompany(handle) {
     const result = await db.query(
       `DELETE FROM companies
       WHERE handle = $1`,
       [handle]
     );
-
-    return result.rows;
+    const deletedCompany = result.rows[0];
+    if (deletedCompany) {
+      return `${handle}`;
+    }
+    throw new ExpressError(`${handle} does not exist`, 404);
   }
 }
 

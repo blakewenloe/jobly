@@ -2,7 +2,7 @@ const Router = require("express").Router;
 const router = new Router();
 const User = require("../models/user");
 
-// register user
+// register route
 router.post("/register", async (req, res, next) => {
   try {
     const registerUser = await User.register(req.body);
@@ -12,7 +12,7 @@ router.post("/register", async (req, res, next) => {
   }
 });
 
-// login user
+// login route
 router.post("/login", async (req, res, next) => {
   try {
     const login = await User.login(req.body);
