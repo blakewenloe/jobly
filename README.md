@@ -1,5 +1,5 @@
 # jobly
-An authenticated job searching and connecting API.
+A job searching and connection API with authentication.
 
 ### Built with:
 * Node.js
