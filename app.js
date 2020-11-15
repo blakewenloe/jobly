@@ -8,7 +8,7 @@ const userRoutes = require("./routes/userRoutes");
 const authRoutes = require("./routes/auth");
 const { authenticateJWT } = require("./middleware/auth");
 const morgan = require("morgan");
-
+const jwt = require("jsonwebtoken");
 app.use(express.json());
 
 // add logging system
@@ -16,7 +16,7 @@ app.use(morgan("tiny"));
 
 // Use middleware
 app.use(authenticateJWT);
-
+app.use(jwt);
 // Use routes
 app.use("/", authRoutes);
 app.use("/companies", companiesRoute);

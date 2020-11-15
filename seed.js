@@ -3,7 +3,6 @@ const db = require("./db");
 
 // Database DDL (for tests)
 const DDL = `
-
   CREATE TABLE companies (
       handle TEXT PRIMARY KEY,
       name TEXT UNIQUE NOT NULL,
